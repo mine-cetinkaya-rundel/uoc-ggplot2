@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data Visualization in R with ggplot2</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Mine Çetinkaya-Rundel" />
+    <meta name="date" content="2019-04-16" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Visualization in R with ggplot2
+## University of Cincinnati
+### Mine Çetinkaya-Rundel
+### 16 April 2019
+
+---
+
+
+
+
+
+
+class: center, middle
+
+# Data visualization
+
+---
+
+## Data visualization
+
+&gt; *"The simple graph has brought more information to the data analyst’s mind than any other device."  
+&gt; — John Tukey*
+
+- Data visualization is the creation and study of the visual representation of data.
+- Many tools for visualizing data (R is one of them)
+- Many approaches/systems within R for making data visualizations, **ggplot2** is one of them
+
+---
+
+## ggplot2 `\(\in\)` tidyverse
+
+.pull-left[
+&lt;img src="../img/ggplot2-part-of-tidyverse.png" width="80%" /&gt;
+]
+.pull-right[
+- **ggplot2**: tidyverse's data visualization package
+- `gg` in "ggplot2" stands for Grammar of Graphics
+- Inspired by the book **Grammar of Graphics** by Leland Wilkinson
+- A grammar of graphics is a tool that enables concise description of 
+components of a graphic
+&lt;img src="../img/grammar-of-graphics.png" width="80%" /&gt;
+]
+
+---
+
+## Following along...
+
+.pull-left[
+### Option 1: RStudio local
+
+- Download the materials at [INSERT LINK] and launch [nameofprof.Rproj]
+- Install `tidyverse` if you haven't done so before, or if you haven't updated it recently
+
+```r
+install.packages("tidyverse")
+```
+
+- Load the tidyverse
+
+```r
+library(tidyverse)
+```
+]
+.pull-right[
+### Option 2: RStudio Cloud
+
+- Go to RStudio Cloud at [INSERT LINK]
+- Open [FILENAME.RMD]
+]
+
+---
+
+## Datasets
+
+* Transit ride data
+    + `daily`: daily summary of rides
+
+* Durham registered voter data
+    + `durham_voters`: one row per voter
+
+
+
+```r
+daily &lt;- read_csv("../data/daily.csv")
+durham_voters &lt;- read_csv("../data/durham_voters.csv")
+```
+
+---
+
+class: center, middle
+
+# Layer up!
+
+---
+
+![](index_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+**Exercise:** Which of the four datasets does this visualization use? Determine 
+which variable is mapped to which aesthetic (x-axis, y-axis, etc.) element 
+of the dataset.
+
+![](index_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+## Basic ggplot2 syntax
+
+* DATA
+* MAPPING
+* GEOM
+
+---
+
+
+```r
+ggplot(data = daily)
+```
+
+![](index_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides))
+```
+
+![](index_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) + 
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth()
+```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](index_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess")
+```
+
+![](index_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE)
+```
+
+![](index_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d()
+```
+
+![](index_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d() +
+  theme_minimal()
+```
+
+![](index_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+![](index_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+---
+
+## ggplot, the making of
+
+1. "Initialize" a plot with ggplot()
+2. Add layers with geom_ functions
+
+```
+ggplot(data = &lt;DATA&gt;) +
+  &lt;GEOM_FUNCTION&gt;(mapping = aes(&lt;MAPPINGS&gt;))+
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+---
+
+class: center, middle
+
+# Mapping
+
+---
+
+## Size by number of riders
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
+---
+
+## Set alpha value
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point(alpha = 0.5)
+```
+
+![](index_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+
+---
+
+**Exercise:** Using information from https://ggplot2.tidyverse.org/articles/ggplot2-specs.html add color, size, alpha, and shape aesthetics to your graph. Experiment. Do different things 
+happen when you map aesthetics to  discrete and continuous variables?
+What happens when you use more than one aesthetic?
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+---
+
+&lt;img src="../img/aesthetic-mappings.png" width="80%" /&gt;
+
+---
+
+## Mappings can be at the `geom` level
+
+
+```r
+ggplot(data = daily) +
+  geom_point(mapping = aes(x = ride_date, y = n_rides))
+```
+
+![](index_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+
+---
+
+## Different mappings for different `geom`s
+
+
+```r
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_smooth(aes(color = day_of_week), method = "loess", se = FALSE)
+```
+
+![](index_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+---
+
+## Set vs. map
+
+.pull-left[
+To **map** an aesthetic to a variable, place it inside `aes()`
+
+```r
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides,
+            color = day_of_week)) +
+  geom_point() 
+```
+
+![](index_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+To **set** an aesthetic to a value, place it outside `aes()`
+
+```r
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides)) +
+  geom_point(color = "red") 
+```
+
+![](index_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+
+---
+
+class: center, middle
+
+# Syntax
+
+---
+
+## Data can be passed in
+
+
+```r
+daily %&gt;%
+  ggplot(aes(x = ride_date, y = n_rides)) +
+    geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+---
+
+## Parameters can be unnamed
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides)) +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+
+## Variable creation on the fly...
+
+Color by weekday / weekend
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+---
+
+## Variable creation on the fly...
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point() +
+  labs(color = "Weekend")
+```
+
+![](index_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+---
+
+## ... or passed in
+
+
+```r
+daily %&gt;%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %&gt;%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) +
+    geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+---
+
+class: center, middle
+
+# Common early pitfalls
+
+---
+
+## Mappings that aren't
+
+
+```r
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides, color = "blue"))
+```
+
+![](index_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+
+---
+
+## Mappings that aren't
+
+
+```r
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides), color = "blue")
+```
+
+![](index_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+---
+
+## + and %&gt;%
+
+**Exercise:** What is wrong with the following?
+
+
+```r
+daily %&gt;%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %&gt;%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %&gt;%
+    geom_point()
+```
+
+---
+
+## + and %&gt;%
+
+What is wrong with the following?
+
+
+```r
+daily %&gt;%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %&gt;%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %&gt;%
+    geom_point()
+```
+
+```
+## Error: `mapping` must be created by `aes()`
+## Did you use %&gt;% instead of +?
+```
+
+---
+
+class: center, middle
+
+# Building up layer by layer
+
+---
+
+## Basic plot
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() 
+```
+
+![](index_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+
+---
+
+## Two layers!
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_line()
+```
+
+![](index_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+
+---
+
+## Iterate on layers
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() + 
+  geom_smooth(span = 0.1) # try changing span
+```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](index_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+
+---
+
+## The power of groups
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() + 
+  geom_line()
+```
+
+![](index_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+
+---
+
+## Now we've got it
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(span = 0.2, se = FALSE)
+```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](index_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+
+---
+
+## Control data by layer
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = filter(daily,
+                           !(day_of_week %in% c("Sat", "Sun")) 
+                           &amp; n_rides &lt; 200),
+             size = 5, color = "gray") +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+
+---
+
+**Exercise:** Work with your neighbor to sketch what the following plot will 
+look like. No cheating! Do not run the code, just think through the code for 
+the time being.
+
+
+```r
+low_weekdays &lt;- daily %&gt;%
+  filter(!(day_of_week %in% c("Sat", "Sun")) &amp; n_rides &lt; 100)
+
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides + 15, label = ride_date), 
+            size = 2, color = "black")
+```
+
+---
+
+
+```r
+low_weekdays &lt;- daily %&gt;%
+  filter(!(day_of_week %in% c("Sat", "Sun")) &amp; n_rides &lt; 100)
+
+low_weekdays
+```
+
+```
+## # A tibble: 9 x 7
+##   ride_date  day_of_week month n_rides n_riders n_unique_stops
+##   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;
+## 1 2015-01-01 Thurs       Jan        58       37             44
+## 2 2015-01-26 Mon         Jan        58       52             15
+## 3 2015-01-28 Wed         Jan        79       65             11
+## 4 2015-01-30 Fri         Jan        25       25             12
+## 5 2015-02-03 Tues        Feb         2        2              2
+## 6 2015-02-17 Tues        Feb        46       34             33
+## 7 2015-02-26 Thurs       Feb        30       22             22
+## 8 2015-05-25 Mon         May        99       55             66
+## 9 2015-12-25 Fri         Dec         1        1              1
+## # … with 1 more variable: n_unique_routes &lt;dbl&gt;
+```
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-43-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  geom_point(data = low_weekdays, size = 5, color = "gray")
+```
+
+![](index_files/figure-html/unnamed-chunk-44-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point()
+```
+
+![](index_files/figure-html/unnamed-chunk-45-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides, label = ride_date), 
+            size = 2, color = "black")
+```
+
+![](index_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides + 15, label = ride_date), 
+            size = 2, color = "black")
+```
+
+![](index_files/figure-html/unnamed-chunk-47-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+library(ggrepel)
+
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_text_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 3, color = "black")
+```
+
+![](index_files/figure-html/unnamed-chunk-48-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_label_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 2, color = "black")
+```
+
+![](index_files/figure-html/unnamed-chunk-49-1.png)&lt;!-- --&gt;
+
+---
+
+**Exercise:** How would you fix the following plot?
+
+
+```r
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(color = "blue")
+```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](index_files/figure-html/unnamed-chunk-50-1.png)&lt;!-- --&gt;
+
+
+---
+
+## Other geoms
+
+- There are a number of other geoms besides `geom_point()`, `geom_line()`, `geom_smooth()`, and `geom_text()`.
+
+- More info: [ggplot2.tidyverse.org/reference](https://ggplot2.tidyverse.org/reference/)
+
+---
+
+class: center, middle
+
+# Splitting over facets
+
+---
+
+## Data prep
+
+
+```r
+daily &lt;- daily %&gt;%
+  mutate(
+    day = if_else(day_of_week %in% c("Sat", "Sun"), "Weekend", "Weekday"),
+    temp = if_else(month %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+                   "Cooler", "Warmer")
+    ) %&gt;%
+  select(day, temp, everything())
+
+daily
+```
+
+```
+## # A tibble: 364 x 9
+##    day   temp  ride_date  day_of_week month n_rides n_riders n_unique_stops
+##    &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;
+##  1 Week… Cool… 2015-01-01 Thurs       Jan        58       37             44
+##  2 Week… Cool… 2015-01-02 Fri         Jan       134       83             93
+##  3 Week… Cool… 2015-01-03 Sat         Jan       145       84            100
+##  4 Week… Cool… 2015-01-04 Sun         Jan       101       57             63
+##  5 Week… Cool… 2015-01-05 Mon         Jan       182      117            109
+##  6 Week… Cool… 2015-01-06 Tues        Jan       267      138            146
+##  7 Week… Cool… 2015-01-07 Wed         Jan       243      157            129
+##  8 Week… Cool… 2015-01-08 Thurs       Jan       235      154            141
+##  9 Week… Cool… 2015-01-09 Fri         Jan       268      173            147
+## 10 Week… Cool… 2015-01-10 Sat         Jan       198      114            116
+## # … with 354 more rows, and 1 more variable: n_unique_routes &lt;dbl&gt;
+```
+
+
+---
+
+## facet_wrap
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_wrap( ~ day)
+```
+
+![](index_files/figure-html/unnamed-chunk-52-1.png)&lt;!-- --&gt;
+
+---
+
+## facet_grid
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(temp ~ day)
+```
+
+![](index_files/figure-html/unnamed-chunk-53-1.png)&lt;!-- --&gt;
+
+---
+
+## facet_grid
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(day ~ temp)
+```
+
+![](index_files/figure-html/unnamed-chunk-54-1.png)&lt;!-- --&gt;
+
+---
+
+## Durham voters
+
+
+```r
+durham_voters %&gt;%
+  select(race_code, gender_code, age)
+```
+
+```
+## # A tibble: 204,063 x 3
+##    race_code gender_code age        
+##    &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;      
+##  1 I         M           Age Over 66
+##  2 U         U           Age 18 - 25
+##  3 O         F           Age 41 - 65
+##  4 W         F           Age 41 - 65
+##  5 W         M           Age 41 - 65
+##  6 B         M           Age 26 - 40
+##  7 W         F           Age 41 - 65
+##  8 W         M           Age 26 - 40
+##  9 B         F           Age 41 - 65
+## 10 B         M           Age 41 - 65
+## # … with 204,053 more rows
+```
+
+---
+
+## Data prep
+
+
+```r
+durham_voters %&gt;%
+  group_by(race_code, gender_code, age) %&gt;%
+  summarize(n_voters = n(), n_rep = sum(party == "REP"))
+```
+
+```
+## # A tibble: 92 x 5
+## # Groups:   race_code, gender_code [21]
+##    race_code gender_code age                            n_voters n_rep
+##    &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;                             &lt;int&gt; &lt;int&gt;
+##  1 A         F           Age &lt; 18 Or Invalid Birth Date        2     0
+##  2 A         F           Age 18 - 25                         751    35
+##  3 A         F           Age 26 - 40                        1086    64
+##  4 A         F           Age 41 - 65                         727    75
+##  5 A         F           Age Over 66                         170    36
+##  6 A         M           Age 18 - 25                         635    42
+##  7 A         M           Age 26 - 40                         919    64
+##  8 A         M           Age 41 - 65                         572    61
+##  9 A         M           Age Over 66                         175    33
+## 10 A         U           Age 18 - 25                           8     1
+## # … with 82 more rows
+```
+
+---
+
+## Data prep
+
+
+```r
+durham_voters_summary &lt;- durham_voters %&gt;%
+  group_by(race_code, gender_code, age) %&gt;%
+  summarize(n_all_voters = n(), n_rep_voters = sum(party == "REP")) %&gt;%
+  filter(gender_code %in% c("F", "M") &amp; 
+         race_code %in% c("W", "B", "A") &amp;
+         age != "Age &lt; 18 Or Invalid Birth Date")
+```
+
+---
+
+## facet_grid
+
+
+```r
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code)
+```
+
+![](index_files/figure-html/unnamed-chunk-58-1.png)&lt;!-- --&gt;
+
+---
+
+## Free scales
+
+
+```r
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
+
+![](index_files/figure-html/unnamed-chunk-59-1.png)&lt;!-- --&gt;
+
+---
+
+## Facets + layers
+
+![](index_files/figure-html/unnamed-chunk-60-1.png)&lt;!-- --&gt;
+
+---
+
+## Facets + layers
+
+Using new tidyr function: `pivot_longer()`
+
+
+```r
+durham_voters_summary %&gt;% 
+  tidyr::pivot_longer(cols = starts_with("n_"), 
+                      names_to = "voter_type", values_to = "n", 
+                      names_prefix = "n_") %&gt;%
+  mutate(age_cat = as.numeric(as.factor(age))) %&gt;%
+  ggplot(aes(x = age, y = n, color = voter_type)) + 
+    geom_point() + 
+    geom_line(aes(x = age_cat)) +
+    facet_grid(race_code ~ gender_code, scales = "free_y") +
+    expand_limits(y = 0)
+```
+
+---
+
+class: center, middle
+
+# Scales and legends
+
+---
+
+## Scale transformation
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_reverse()
+```
+
+![](index_files/figure-html/unnamed-chunk-62-1.png)&lt;!-- --&gt;
+
+---
+
+## Scale transformation
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_sqrt()
+```
+
+![](index_files/figure-html/unnamed-chunk-63-1.png)&lt;!-- --&gt;
+
+---
+
+## Scale details
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_continuous(breaks = c(0, 200, 500))
+```
+
+![](index_files/figure-html/unnamed-chunk-64-1.png)&lt;!-- --&gt;
+
+---
+
+class: center, middle
+
+# Themes and refinements
+
+---
+
+## Overall themes
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_bw()
+```
+
+![](index_files/figure-html/unnamed-chunk-65-1.png)&lt;!-- --&gt;
+
+---
+
+## Overall themes
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_dark()
+```
+
+![](index_files/figure-html/unnamed-chunk-66-1.png)&lt;!-- --&gt;
+
+---
+
+## Customizing theme elements
+
+
+```r
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+![](index_files/figure-html/unnamed-chunk-67-1.png)&lt;!-- --&gt;
+
+---
+
+**Exercise:** Fix the axis labels in the following plot so they don't overlap by playing around with their orientation.
+
+
+```r
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
+
+![](index_files/figure-html/unnamed-chunk-68-1.png)&lt;!-- --&gt;
+
+---
+
+## Themes Vignette
+
+To really master themes:
+
+[ggplot2.tidyverse.org/articles/extending-ggplot2.html#creating-your-own-theme](https://ggplot2.tidyverse.org/articles/extending-ggplot2.html#creating-your-own-theme)
+
+---
+
+class: center, middle
+
+# Recap
+
+---
+
+## The basics
+
+* map variables to aethestics
+* add "geoms" for visual representation layers
+* scales can be independently managed
+* legends are automatically created
+* statistics are sometimes calculated by geoms
+
+---
+
+## ggplot2 template
+
+Make any plot by filling in the parameters of this template
+
+
+```r
+knitr::include_graphics("../img/ggplot2-template.png")
+```
+
+&lt;img src="../img/ggplot2-template.png" width="100%" /&gt;
+
+
+---
+
+## Learn more
+
+* Books: 
+  - [R for Data Science](https://r4ds.had.co.nz) by Grolemund and Wickham
+  - [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/) by Chang
+  - [Data Visualization: A Practical Introduction](https://kieranhealy.org/publications/dataviz/) by Healy
+* [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org/)
+* [ggplot2 Cheat sheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+* Contributed extensions: [ggplot2-exts.org](http://www.ggplot2-exts.org/)
+
+---
+
+## Thanks
+
+Thanks to Elaine McVey and Sheila Saia for sharing their slides from previous R-Ladies RTP meetups!
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "solarized-light",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
