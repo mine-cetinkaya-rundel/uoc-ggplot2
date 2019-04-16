@@ -1,0 +1,894 @@
+---
+title: "Data Visualization in R with ggplot2"
+subtitle: "University of Cincinnati"
+author: "Mine Çetinkaya-Rundel"
+date: "16 April 2019"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: solarized-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 5, fig.height = 3, dpi = 300)
+```
+
+```{r xaringan-themer, include = FALSE}
+library(xaringanthemer)
+mono_accent(
+  base_color = "#0084A1",
+  header_font_google = google_font("Raleway"),
+  text_font_google   = google_font("Raleway", "300", "300i"),
+  code_font_google   = google_font("Fira Code"),
+  text_font_size     = "24px"
+)
+```
+
+class: center, middle
+
+# Data visualization
+
+---
+
+## Data visualization
+
+> *"The simple graph has brought more information to the data analyst’s mind than any other device."  
+> — John Tukey*
+
+- Data visualization is the creation and study of the visual representation of data.
+- Many tools for visualizing data (R is one of them)
+- Many approaches/systems within R for making data visualizations, **ggplot2** is one of them
+
+---
+
+## ggplot2 $\in$ tidyverse
+
+.pull-left[
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img/ggplot2-part-of-tidyverse.png")
+```
+]
+.pull-right[
+- **ggplot2**: tidyverse's data visualization package
+- `gg` in "ggplot2" stands for Grammar of Graphics
+- Inspired by the book **Grammar of Graphics** by Leland Wilkinson
+- A grammar of graphics is a tool that enables concise description of 
+components of a graphic
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img/grammar-of-graphics.png")
+```
+]
+
+---
+
+## Following along...
+
+.pull-left[
+### Option 1: RStudio local
+
+- Download the materials at [INSERT LINK] and launch [nameofprof.Rproj]
+- Install `tidyverse` if you haven't done so before, or if you haven't updated it recently
+```{r, message=FALSE, eval=FALSE}
+install.packages("tidyverse")
+```
+
+- Load the tidyverse
+```{r, message=FALSE}
+library(tidyverse)
+```
+]
+.pull-right[
+### Option 2: RStudio Cloud
+
+- Go to RStudio Cloud at [INSERT LINK]
+- Open [FILENAME.RMD]
+]
+
+---
+
+## Datasets
+
+* Transit ride data
+    + `daily`: daily summary of rides
+
+* Durham registered voter data
+    + `durham_voters`: one row per voter
+
+
+```{r, message=FALSE, eval=TRUE} 
+daily <- read_csv("data/daily.csv")
+durham_voters <- read_csv("data/durham_voters.csv")
+```
+
+---
+
+class: center, middle
+
+# Layer up!
+
+---
+
+```{r echo=FALSE}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC") +
+  scale_color_viridis_d()
+```
+
+---
+
+**Exercise:** Which of the four datasets does this visualization use? Determine 
+which variable is mapped to which aesthetic (x-axis, y-axis, etc.) element 
+of the dataset.
+
+```{r echo=FALSE, fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC") +
+  scale_color_viridis_d()
+```
+
+---
+
+## Basic ggplot2 syntax
+
+* DATA
+* MAPPING
+* GEOM
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily)
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides))
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) + 
+  geom_point()
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_point()
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth()
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess")
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE)
+```
+
+---
+
+```{r fig.height=2.5}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d()
+```
+
+---
+
+```{r fig.height=2.25}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d() +
+  theme_minimal()
+```
+
+---
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+---
+
+## ggplot, the making of
+
+1. "Initialize" a plot with ggplot()
+2. Add layers with geom_ functions
+
+```
+ggplot(data = <DATA>) +
+  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))+
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+---
+
+class: center, middle
+
+# Mapping
+
+---
+
+## Size by number of riders
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point()
+```
+
+---
+
+## Set alpha value
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point(alpha = 0.5)
+```
+
+---
+
+**Exercise:** Using information from https://ggplot2.tidyverse.org/articles/ggplot2-specs.html add color, size, alpha, and shape aesthetics to your graph. Experiment. Do different things 
+happen when you map aesthetics to  discrete and continuous variables?
+What happens when you use more than one aesthetic?
+
+```{r fig.height=2, eval=FALSE}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+---
+
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img/aesthetic-mappings.png")
+```
+
+---
+
+## Mappings can be at the `geom` level
+
+```{r fig.height=2}
+ggplot(data = daily) +
+  geom_point(mapping = aes(x = ride_date, y = n_rides))
+```
+
+---
+
+## Different mappings for different `geom`s
+
+```{r fig.height=2}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_smooth(aes(color = day_of_week), method = "loess", se = FALSE)
+```
+
+---
+
+## Set vs. map
+
+.pull-left[
+To **map** an aesthetic to a variable, place it inside `aes()`
+```{r fig.height=2.25}
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides,
+            color = day_of_week)) +
+  geom_point() 
+```
+]
+.pull-right[
+To **set** an aesthetic to a value, place it outside `aes()`
+```{r fig.height=2.25}
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides)) +
+  geom_point(color = "red") 
+```
+]
+
+---
+
+class: center, middle
+
+# Syntax
+
+---
+
+## Data can be passed in
+
+```{r fig.height = 2}
+daily %>%
+  ggplot(aes(x = ride_date, y = n_rides)) +
+    geom_point()
+```
+
+---
+
+## Parameters can be unnamed
+
+```{r fig.height = 2}
+ggplot(daily, aes(x = ride_date, y = n_rides)) +
+  geom_point()
+```
+
+---
+
+## Variable creation on the fly...
+
+Color by weekday / weekend
+
+```{r fig.height = 1.9}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point()
+```
+
+---
+
+## Variable creation on the fly...
+
+```{r fig.height = 1.9}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point() +
+  labs(color = "Weekend")
+```
+
+---
+
+## ... or passed in
+
+```{r fig.height = 1.9}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) +
+    geom_point()
+```
+
+---
+
+class: center, middle
+
+# Common early pitfalls
+
+---
+
+## Mappings that aren't
+
+```{r fig.height=2}
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides, color = "blue"))
+```
+
+---
+
+## Mappings that aren't
+
+```{r fig.height=2}
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides), color = "blue")
+```
+
+---
+
+## + and %>%
+
+**Exercise:** What is wrong with the following?
+
+```{r eval = FALSE}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %>%
+    geom_point()
+```
+
+---
+
+## + and %>%
+
+What is wrong with the following?
+
+```{r error = TRUE}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %>%
+    geom_point()
+```
+
+---
+
+class: center, middle
+
+# Building up layer by layer
+
+---
+
+## Basic plot
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() 
+```
+
+---
+
+## Two layers!
+
+```{r fig.height=1.8}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_line()
+```
+
+---
+
+## Iterate on layers
+
+```{r fig.height=1.8}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() + 
+  geom_smooth(span = 0.1) # try changing span
+```
+
+---
+
+## The power of groups
+
+```{r fig.height=1.8}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() + 
+  geom_line()
+```
+
+---
+
+## Now we've got it
+
+```{r fig.height=1.8}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(span = 0.2, se = FALSE)
+```
+
+---
+
+## Control data by layer
+
+```{r fig.height=1.8}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = filter(daily,
+                           !(day_of_week %in% c("Sat", "Sun")) 
+                           & n_rides < 200),
+             size = 5, color = "gray") +
+  geom_point()
+```
+
+---
+
+**Exercise:** Work with your neighbor to sketch what the following plot will 
+look like. No cheating! Do not run the code, just think through the code for 
+the time being.
+
+```{r eval=FALSE}
+low_weekdays <- daily %>%
+  filter(!(day_of_week %in% c("Sat", "Sun")) & n_rides < 100)
+
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides + 15, label = ride_date), 
+            size = 2, color = "black")
+```
+
+---
+
+```{r}
+low_weekdays <- daily %>%
+  filter(!(day_of_week %in% c("Sat", "Sun")) & n_rides < 100)
+
+low_weekdays
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point()
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  geom_point(data = low_weekdays, size = 5, color = "gray")
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point()
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides, label = ride_date), 
+            size = 2, color = "black")
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides + 15, label = ride_date), 
+            size = 2, color = "black")
+```
+
+---
+
+```{r fig.height=2}
+library(ggrepel)
+
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_text_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 3, color = "black")
+```
+
+---
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_label_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 2, color = "black")
+```
+
+---
+
+**Exercise:** How would you fix the following plot?
+
+```{r fig.height=2}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(color = "blue")
+```
+
+
+---
+
+## Other geoms
+
+- There are a number of other geoms besides `geom_point()`, `geom_line()`, `geom_smooth()`, and `geom_text()`.
+
+- More info: [ggplot2.tidyverse.org/reference](https://ggplot2.tidyverse.org/reference/)
+
+---
+
+class: center, middle
+
+# Splitting over facets
+
+---
+
+## Data prep
+
+```{r}
+daily <- daily %>%
+  mutate(
+    day = if_else(day_of_week %in% c("Sat", "Sun"), "Weekend", "Weekday"),
+    temp = if_else(month %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+                   "Cooler", "Warmer")
+    ) %>%
+  select(day, temp, everything())
+
+daily
+```
+
+
+---
+
+## facet_wrap
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_wrap( ~ day)
+```
+
+---
+
+## facet_grid
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(temp ~ day)
+```
+
+---
+
+## facet_grid
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(day ~ temp)
+```
+
+---
+
+## Durham voters
+
+```{r}
+durham_voters %>%
+  select(race_code, gender_code, age)
+```
+
+---
+
+## Data prep
+
+```{r}
+durham_voters %>%
+  group_by(race_code, gender_code, age) %>%
+  summarize(n_voters = n(), n_rep = sum(party == "REP"))
+```
+
+---
+
+## Data prep
+
+```{r}
+durham_voters_summary <- durham_voters %>%
+  group_by(race_code, gender_code, age) %>%
+  summarize(n_all_voters = n(), n_rep_voters = sum(party == "REP")) %>%
+  filter(gender_code %in% c("F", "M") & 
+         race_code %in% c("W", "B", "A") &
+         age != "Age < 18 Or Invalid Birth Date")
+```
+
+---
+
+## facet_grid
+
+```{r fig.height = 2}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code)
+```
+
+---
+
+## Free scales
+
+```{r fig.height = 2}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
+
+---
+
+## Facets + layers
+
+```{r, echo = FALSE, fig.width = 7}
+durham_voters_summary %>% 
+  tidyr::pivot_longer(cols = starts_with("n_"), 
+                      names_to = "voter_type", values_to = "n", 
+                      names_prefix = "n_") %>%
+  mutate(age_cat = as.numeric(as.factor(age))) %>%
+  ggplot(aes(x = age, y = n, color = voter_type)) + 
+    geom_point() + 
+    geom_line(aes(x = age_cat)) +
+    facet_grid(race_code ~ gender_code, scales = "free_y") +
+    expand_limits(y = 0)
+```
+
+---
+
+## Facets + layers
+
+Using new tidyr function: `pivot_longer()`
+
+```{r, eval = FALSE}
+durham_voters_summary %>% 
+  tidyr::pivot_longer(cols = starts_with("n_"), 
+                      names_to = "voter_type", values_to = "n", 
+                      names_prefix = "n_") %>%
+  mutate(age_cat = as.numeric(as.factor(age))) %>%
+  ggplot(aes(x = age, y = n, color = voter_type)) + 
+    geom_point() + 
+    geom_line(aes(x = age_cat)) +
+    facet_grid(race_code ~ gender_code, scales = "free_y") +
+    expand_limits(y = 0)
+```
+
+---
+
+class: center, middle
+
+# Scales and legends
+
+---
+
+## Scale transformation
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_reverse()
+```
+
+---
+
+## Scale transformation
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_sqrt()
+```
+
+---
+
+## Scale details
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_continuous(breaks = c(0, 200, 500))
+```
+
+---
+
+class: center, middle
+
+# Themes and refinements
+
+---
+
+## Overall themes
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_bw()
+```
+
+---
+
+## Overall themes
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_dark()
+```
+
+---
+
+## Customizing theme elements
+
+```{r fig.height=2}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+---
+
+**Exercise:** Fix the axis labels in the following plot so they don't overlap by playing around with their orientation.
+
+```{r fig.height = 2}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
+
+---
+
+## Themes Vignette
+
+To really master themes:
+
+[ggplot2.tidyverse.org/articles/extending-ggplot2.html#creating-your-own-theme](https://ggplot2.tidyverse.org/articles/extending-ggplot2.html#creating-your-own-theme)
+
+---
+
+class: center, middle
+
+# Recap
+
+---
+
+## The basics
+
+* map variables to aethestics
+* add "geoms" for visual representation layers
+* scales can be independently managed
+* legends are automatically created
+* statistics are sometimes calculated by geoms
+
+---
+
+## ggplot2 template
+
+Make any plot by filling in the parameters of this template
+
+```{r out.width="100%"}
+knitr::include_graphics("img/ggplot2-template.png")
+```
+
+
+---
+
+## Learn more
+
+* Books: 
+  - [R for Data Science](https://r4ds.had.co.nz) by Grolemund and Wickham
+  - [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/) by Chang
+  - [Data Visualization: A Practical Introduction](https://kieranhealy.org/publications/dataviz/) by Healy
+* [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org/)
+* [ggplot2 Cheat sheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+* Contributed extensions: [ggplot2-exts.org](http://www.ggplot2-exts.org/)
+
+---
+
+## Thanks
+
+Thanks to Elaine McVey and Sheila Saia for sharing their slides from previous R-Ladies RTP meetups!
