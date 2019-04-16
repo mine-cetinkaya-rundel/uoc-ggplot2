@@ -1,0 +1,572 @@
+---
+title: "Data Visualization in R with ggplot2"
+author: "Mine Cetinkaya-Rundel"
+date: "4/16/2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggrepel)
+```
+
+# Data visualization
+
+## Datasets
+
+* Transit ride data
+    + `daily`: daily summary of rides
+
+* Durham registered voter data
+    + `durham_voters`: one row per voter
+
+```{r, message=FALSE, eval=TRUE} 
+daily <- read_csv("data/daily.csv")
+durham_voters <- read_csv("data/durham_voters.csv")
+```
+
+# Layer up!
+
+```{r echo=FALSE}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC") +
+  scale_color_viridis_d()
+```
+
+## Your turn!
+
+**Exercise:** Which of the four datasets does this visualization use? Determine 
+which variable is mapped to which aesthetic (x-axis, y-axis, etc.) element 
+of the dataset.
+
+```{r echo=FALSE,}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC") +
+  scale_color_viridis_d()
+```
+
+## Step-by-step
+
+```{r}
+ggplot(data = daily)
+```
+
+```{r}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides))
+```
+
+```{r}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) + 
+  geom_point()
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_point()
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth()
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess")
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE)
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d()
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_color_viridis_d() +
+  theme_minimal()
+```
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+# Mapping
+
+## Size by number of riders
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point()
+```
+
+## Set alpha value
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, size = n_riders)) +
+  geom_point(alpha = 0.5)
+```
+
+## Your turn!
+
+**Exercise:** Using information from https://ggplot2.tidyverse.org/articles/ggplot2-specs.html add color, size, alpha, and shape aesthetics to your graph. Experiment. Do different things 
+happen when you map aesthetics to  discrete and continuous variables?
+What happens when you use more than one aesthetic?
+
+```{r, eval=FALSE}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(se = FALSE, method = "loess") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(x = "Ride date", y = "Number of rides", color = "Day of week",
+       title = "Daily rides", subtitle = "Durham, NC")
+```
+
+## Mappings can be at the `geom` level
+
+```{r}
+ggplot(data = daily) +
+  geom_point(mapping = aes(x = ride_date, y = n_rides))
+```
+
+## Different mappings for different `geom`s
+
+```{r}
+ggplot(data = daily, mapping = aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_smooth(aes(color = day_of_week), method = "loess", se = FALSE)
+```
+
+## Set vs. map
+
+- To **map** an aesthetic to a variable, place it inside `aes()`
+```{r}
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides,
+            color = day_of_week)) +
+  geom_point() 
+```
+
+- To **set** an aesthetic to a value, place it outside `aes()`
+```{r}
+ggplot(data = daily, 
+  mapping = aes(x = ride_date, 
+                y = n_rides)) +
+  geom_point(color = "red") 
+```
+
+# Syntax
+
+## Data can be passed in
+
+```{r}
+daily %>%
+  ggplot(aes(x = ride_date, y = n_rides)) +
+    geom_point()
+```
+
+## Parameters can be unnamed
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides)) +
+  geom_point()
+```
+
+## Variable creation on the fly...
+
+Color by weekday / weekend
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point()
+```
+
+
+## Variable creation on the fly...
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, 
+       color = day_of_week %in% c("Sat", "Sun"))) +
+  geom_point() +
+  labs(color = "Weekend")
+```
+
+## ... or passed in
+
+```{r}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) +
+    geom_point()
+```
+
+# Common early pitfalls
+
+## Mappings that aren't
+
+```{r}
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides, color = "blue"))
+```
+
+## Mappings that aren't
+
+```{r}
+ggplot(data = daily) +
+  geom_point(aes(x = ride_date, y = n_rides), color = "blue")
+```
+
+## Your turn!
+
+**Exercise:** What is wrong with the following?
+
+```{r eval = FALSE}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %>%
+    geom_point()
+```
+
+## + and %>%
+
+What is wrong with the following?
+
+```{r error = TRUE}
+daily %>%
+  mutate(day_type = if_else(day_of_week %in% c("Sat", "Sun"),
+                            "Weekend",
+                            "Weekday")) %>%
+  ggplot(aes(x = ride_date, y = n_rides, color = day_type)) %>%
+    geom_point()
+```
+
+# Building up layer by layer
+
+## Basic plot
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() 
+```
+
+## Two layers!
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() +
+  geom_line()
+```
+
+## Iterate on layers
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_point() + 
+  geom_smooth(span = 0.1) # try changing span
+```
+
+## The power of groups
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() + 
+  geom_line()
+```
+
+## Now we've got it
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(span = 0.2, se = FALSE)
+```
+
+## Control data by layer
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = filter(daily,
+                           !(day_of_week %in% c("Sat", "Sun")) 
+                           & n_rides < 200),
+             size = 5, color = "gray") +
+  geom_point()
+```
+
+## Your turn!
+
+**Exercise:** Work with your neighbor to sketch what the following plot will 
+look like. No cheating! Do not run the code, just think through the code for 
+the time being.
+
+## Step by step
+
+```{r}
+low_weekdays <- daily %>%
+  filter(!(day_of_week %in% c("Sat", "Sun")) & n_rides < 100)
+
+low_weekdays
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point()
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  geom_point(data = low_weekdays, size = 5, color = "gray")
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point()
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides, label = ride_date), 
+            size = 2, color = "black")
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() +
+  geom_text(data = low_weekdays, aes(y = n_rides + 15, label = ride_date), 
+            size = 2, color = "black")
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_text_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 3, color = "black")
+```
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point(data = low_weekdays, size = 5, color = "gray") +
+  geom_point() + 
+  geom_label_repel(data = low_weekdays, 
+                  aes(x = ride_date, y = n_rides, 
+                      label = as.character(ride_date)), 
+                  size = 2, color = "black")
+```
+
+## Your turn!
+
+**Exercise:** How would you fix the following plot?
+
+```{r}
+ggplot(daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_smooth(color = "blue")
+```
+
+# Splitting over facets
+
+## Data prep
+
+```{r}
+daily <- daily %>%
+  mutate(
+    day = if_else(day_of_week %in% c("Sat", "Sun"), "Weekend", "Weekday"),
+    temp = if_else(month %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+                   "Cooler", "Warmer")
+    ) %>%
+  select(day, temp, everything())
+
+daily
+```
+
+## facet_wrap
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_wrap( ~ day)
+```
+
+## facet_grid
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(temp ~ day)
+```
+
+## facet_grid
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides)) +
+  geom_line() +
+  facet_grid(day ~ temp)
+```
+
+## Durham voters
+
+```{r}
+durham_voters %>%
+  select(race_code, gender_code, age)
+```
+
+## Data prep
+
+```{r}
+durham_voters %>%
+  group_by(race_code, gender_code, age) %>%
+  summarize(n_voters = n(), n_rep = sum(party == "REP"))
+```
+
+## Data prep
+
+```{r}
+durham_voters_summary <- durham_voters %>%
+  group_by(race_code, gender_code, age) %>%
+  summarize(n_all_voters = n(), n_rep_voters = sum(party == "REP")) %>%
+  filter(gender_code %in% c("F", "M") & 
+         race_code %in% c("W", "B", "A") &
+         age != "Age < 18 Or Invalid Birth Date")
+```
+
+## facet_grid
+
+```{r}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code)
+```
+
+## Free scales
+
+```{r}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
+
+## Facets + layers
+
+```{r, echo = FALSE}
+durham_voters_summary %>% 
+  tidyr::pivot_longer(cols = starts_with("n_"), 
+                      names_to = "voter_type", values_to = "n", 
+                      names_prefix = "n_") %>%
+  mutate(age_cat = as.numeric(as.factor(age))) %>%
+  ggplot(aes(x = age, y = n, color = voter_type)) + 
+    geom_point() + 
+    geom_line(aes(x = age_cat)) +
+    facet_grid(race_code ~ gender_code, scales = "free_y") +
+    expand_limits(y = 0)
+```
+
+## Facets + layers
+
+Using new tidyr function: `pivot_longer()`
+
+```{r, eval = FALSE}
+durham_voters_summary %>% 
+  tidyr::pivot_longer(cols = starts_with("n_"), 
+                      names_to = "voter_type", values_to = "n", 
+                      names_prefix = "n_") %>%
+  mutate(age_cat = as.numeric(as.factor(age))) %>%
+  ggplot(aes(x = age, y = n, color = voter_type)) + 
+    geom_point() + 
+    geom_line(aes(x = age_cat)) +
+    facet_grid(race_code ~ gender_code, scales = "free_y") +
+    expand_limits(y = 0)
+```
+
+# Scales and legends
+
+## Scale transformation
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_reverse()
+```
+
+## Scale transformation
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_sqrt()
+```
+
+## Scale details
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  scale_y_continuous(breaks = c(0, 200, 500))
+```
+
+# Themes and refinements
+
+## Overall themes
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_bw()
+```
+
+## Overall themes
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme_dark()
+```
+
+## Customizing theme elements
+
+```{r}
+ggplot(data = daily, aes(x = ride_date, y = n_rides, color = day_of_week)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+## Your turn!
+
+**Exercise:** Fix the axis labels in the following plot so they are at a 45 degree angle.
+
+```{r}
+ggplot(durham_voters_summary, aes(x = age, y = n_all_voters)) +
+  geom_bar(stat = "identity") +
+  facet_grid(race_code ~ gender_code, scales = "free_y")
+```
