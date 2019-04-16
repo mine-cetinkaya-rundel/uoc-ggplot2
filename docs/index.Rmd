@@ -2,7 +2,7 @@
 title: "Data Visualization in R with ggplot2"
 subtitle: "University of Cincinnati"
 author: "Mine Çetinkaya-Rundel"
-date: "16 April 2019"
+date: "16 April 2019 <br><br> rstd.io/uoc-ggplot2-slides"
 output:
   xaringan::moon_reader:
     lib_dir: libs
